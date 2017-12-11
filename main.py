@@ -43,7 +43,7 @@ def main():
             #rendering environmet (optional)            
             env.render()
             x = observation
-            action = agent.evaluate_actor(np.reshape(x,[1,num_states]))
+            action = agent.evaluate_actor(np.reshape(x,[1, 300, 300, 2]))
             noise = exploration_noise.noise()
             action = action[0] + noise #Select action according to current policy and exploration noise
             print("Action at step", t ," :",action,"\n")
