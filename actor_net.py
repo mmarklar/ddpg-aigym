@@ -16,12 +16,12 @@ class ActorNet:
             # Create the actor network
             self.wc1, self.wc2, self.wd1, self.out_weight, \
                 self.bc1, self.bc2, self.bd1, self.out_bias, \
-                self.in_tensor, self.output = self.create_actor_net()
+                self.in_tensor, self.output, self.fc1= self.create_actor_net()
 
             # Create the target network
             self.t_wc1, self.t_wc2, self.t_wd1, self.t_out_weight, \
                 self.t_bc1, self.t_bc2, self.t_bd1, self.t_out_bias, \
-                self.t_in_tensor, self.t_output = self.create_actor_net()
+                self.t_in_tensor, self.t_output, self.t_fc1 = self.create_actor_net()
             
             
             #cost of actor network:
@@ -66,13 +66,13 @@ class ActorNet:
         # 2x conv2d layers, 2x dense with the second being the output layer
         wc1 = tf.Variable(tf.random_normal([5, 5, 2, 32]))
         wc2 = tf.Variable(tf.random_normal([5, 5, 32, 64]))
-        wd1 = tf.Variable(tf.random_normal([180000, 1024]))
-        out_weight = tf.Variable(tf.random_normal([1024, num_actions]))
+        wd1 = tf.Variable(tf.random_normal([360000, 400]))
+        out_weight = tf.Variable(tf.random_normal([400, num_actions]))
 
         # Create the biases for the layers
         bc1 = tf.Variable(tf.random_normal([32]))
         bc2 = tf.Variable(tf.random_normal([64]))
-        bd1 = tf.Variable(tf.random_normal([1024]))
+        bd1 = tf.Variable(tf.random_normal([400]))
         out_bias = tf.Variable(tf.random_normal([num_actions]))
 
         # Create the model
@@ -94,10 +94,14 @@ class ActorNet:
 
         # Get the output
         output = tf.add(tf.matmul(fc1, out_weight), out_bias)
-        return wc1, wc2, wd1, out_weight, bc1, bc2, bd1, out_bias, in_tensor, output
+        #print("Output shape****************", output.shape)
+        return wc1, wc2, wd1, out_weight, bc1, bc2, bd1, out_bias, in_tensor, output, fc1
         
     def evaluate_actor(self,state_t):
-        return self.sess.run(self.output, feed_dict={self.in_tensor:state_t})        
+        result = self.sess.run(self.output, feed_dict={self.in_tensor:state_t})
+        #size = self.sess.run(tf.shape(self.fc1), feed_dict={self.in_tensor:state_t})
+        #print(size)
+        return result
         
     def evaluate_target_actor(self,state_t_1):
         return self.sess.run(self.t_output, feed_dict={self.t_in_tensor: state_t_1})
